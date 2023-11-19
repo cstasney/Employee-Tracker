@@ -1,9 +1,9 @@
 // dependencies
 const inquirer = require('inquirer')
-const express = require('express')
 const sequelize = require('./config/connection');
 const figlet = require("figlet");
 const chalk = require('chalk');
+const consoleTable = ('console.table')
 
 
 // startup and terminal prompts for user input
@@ -91,9 +91,30 @@ const startApp = () => {
             }
 
             if (choices === 'Exit') {
-                connection.end();
+                sequelize.end();
             }
         });
 };
+
+// View Employees
+const viewAllEmployees = () => {
+    let sql = `SELECT employee.id,
+                employye.first_name,
+                employee.last_name,
+                role.title, 
+                department.department_name AS 'department', 
+                role.salary
+                FROM employee, role, department 
+                WHERE department.id = role.department_id 
+                AND role.id = employee.role_id
+                ORDER BY employee.id ASC`;
+    sequelize.promise().query(sql, (error, response) => {
+        if (error) throw error;
+        console.log(chalk.blue(`Current Employees`));
+        console.table(response);
+        startApp()
+    });
+};
+
 startApp();
 
