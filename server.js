@@ -5,9 +5,11 @@ const figlet = require("figlet");
 const chalk = require('chalk');
 
 // startup and terminal prompts for user input
-const startApp = () => {
+const startApp = () => {    
+    console.log(chalk.hex('#F07857').bold(`====================================================================================`));
     console.log(chalk.blue(figlet.textSync("Employee Tracker")));
     console.log(`                                                          ` + chalk.greenBright.bold('Created By: Chris Stasney'));
+    console.log(chalk.hex('#F07857').bold(`====================================================================================`));
 
 
     inquirer.prompt([
@@ -106,17 +108,29 @@ const viewAllEmployees = () => {
     WHERE department.id = role.department_id
     AND role.id = employee.role_id
     ORDER BY employee.id ASC`;
-    connection
-        .promise()
-        .query(sql)
-        .then(([rows]) => {
-            let employees = rows;
-            console.table(employees);
+    connection.promise().query(sql).then(([rows]) => {
+        let employees = rows;    
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.log(`                              ` + chalk.blue(`Employees:`));
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.table(employees);
         startApp();
-        });
+    });
 };
 
-
+const viewAllRoles = () => {
+    console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+    console.log(`                              ` + chalk.blue(`Employee Roles:`));
+    console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+    const sql = `SELECT role.id, role.title, department.department_name AS department
+                    FROM role
+                    INNER JOIN department ON role.department_id = department.id`;
+    connection.promise().query(sql).then(([rows]) => {
+        let roles = rows;
+        console.table(roles);
+        startApp();
+    });
+};
 
 startApp();
 
