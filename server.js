@@ -349,60 +349,63 @@ const addDepartment = () => {
 
 // Update Employee Role
 const updateEmployeeRole = () => {
-    let sql = `SELECT employee.id, 
-                employee.first_name, 
-                employee.last_name, role.id AS "role_id" FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`;
+    let sql = `SELECT employee.id,
+                  employee.first_name,
+                  employee.last_name, role.id AS "role_id" FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`;
     connection.query(sql, (error, response) => {
-        if (error) throw error;
-        let employeeNamesArray = [];
-        response.forEach((employee) => {
-            employeeNamesArray.push({
-                name: `${employee.first_name} ${employee.last_name}`,
-                id: employee.id,
-            });
+      if (error) throw error;
+      let employeeNamesArray = [];
+      response.forEach((employee) => {
+        employeeNamesArray.push({
+          name: `${employee.first_name} ${employee.last_name}`,
+          id: employee.id,
         });
-        let sql = `SELECT role.id, role.title FROM role`;
-        connection.query(sql, (error, response) => {
-            if (error) throw error;
-            let rolesArray = [];
-            response.forEach((role) => { rolesArray.push(role.title); });
-
-            inquirer
-                .prompt([
-                    {
-                        name: 'chosenEmployee',
-                        type: 'list',
-                        message: 'Which employee has changed roles?',
-                        choices: employeeNamesArray
-                    },
-                    {
-                        name: 'chosenRole',
-                        type: 'list',
-                        message: 'What is the employees?',
-                        choices: rolesArray
-                    }
-                ]);
+      });
+      let sql = `SELECT role.id, role.title FROM role`;
+      connection.query(sql, (error, response) => {
+        if (error) throw error;
+        let rolesArray = [];
+        response.forEach((role) => {
+          rolesArray.push(role.title);
+        });
+        inquirer
+          .prompt([
+            {
+              name: "chosenEmployee",
+              type: "list",
+              message: "Which employee has changed roles?",
+              choices: employeeNamesArray,
+            },
+            {
+              name: "chosenRole",
+              type: "list",
+              message: "What is the employees new role?",
+              choices: rolesArray,
+            },
+          ])
+          .then((answer) => {
             let newTitleId, employeeId;
             let choice = employeeNamesArray.filter((element) => {
-                return element.name === answer.chosenEmployee;
+              return element.name === answer.chosenEmployee;
             });
             employeeId = choice[0].id;
             response.forEach((role) => {
-                if (answer.chosenRole === role.title) {
-                    newTitleId = role.id;
-                }
+              if (answer.chosenRole === role.title) {
+                newTitleId = role.id;
+              }
             });
             let sqls = `UPDATE employee SET role_id = ? WHERE id = ?`;
             connection.query(sqls, [newTitleId, employeeId], (error) => {
-                if (error) throw error;
-                console.log(chalk.hex('#F07857').bold(`====================================================================================`));
-                console.log(chalk.greenBright(`Employee Role Updated`));
-                console.log(chalk.hex('#F07857').bold(`====================================================================================`));
-                startApp();
+              if (error) throw error;
+              console.log(chalk.hex("#F07857").bold('===================================================================================='));
+              console.log(chalk.greenBright('Employee Role Updated'));
+              console.log(chalk.hex("#F07857").bold('===================================================================================='));
+              startApp();
             });
-        });
+          });
+      });
     });
-};
+  };
 
 // // Update an Employee's Manager
 // const updateEmployeeManager = () => {
