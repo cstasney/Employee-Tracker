@@ -3,6 +3,7 @@ const inquirer = require('inquirer')
 const connection = require('./config/connection');
 const figlet = require("figlet");
 const chalk = require('chalk');
+const validate = ('/validate.validate.js')
 
 // startup and terminal prompts for user input
 const startApp = () => {
@@ -182,6 +183,83 @@ const viewDepartmentBudget = () => {
         console.table(departmentBudgets);
         startApp();
     });
+};
+
+// Add new employee
+
+const addEmployee = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'fistName',
+            message: "What is the employee's first name?",
+            validate: addFirstName => {
+                if (addFirstName) {
+                    return true;
+                } else {
+                    console.log('Please enter a first name');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: "What is the employee's last name?",
+            validate: addLastName => {
+                if (addLastName) {
+                    return true;
+                } else {
+                    console.log('Please enter a last name');
+                    return false;
+                }
+            }
+        }
+    ])
+        .then(answer => {
+            const crit = [answer.fistName, answer.lastName]
+            const roleSql = `SELECT role.id, role.title FROM role`;
+            connection.query(roleSql, (error, response) => {
+                if (error) throw error;
+                const roles = response.map(({ id, title }) => ({ name: title, value: id }));
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: "What is the employee's role?",
+                        choices: roles
+                    }
+                ])
+                    .then(roleChoice => {
+                        const role = roleChoice.role;
+                        crit.push(role);
+                        const managerSql = `SELECT * FROM employee`;
+                        connection.query(managerSql, (error, response) => {
+                            if (error) throw error;
+                            const managers = response.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id }));
+                            inquirer.prompt([
+                                {
+                                    type: 'list',
+                                    name: 'manager',
+                                    message: "Who is the employee's manager?",
+                                    choices: managers
+                                }
+                            ])
+                                .then(managerChoice => {
+                                    const manager = managerChoice.manager;
+                                    crit.push(manager);
+                                    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                    VALUES (?, ?, ?, ?)`;
+                                    connection.query(sql, crit, (error) => {
+                                        if (error) throw error;
+                                        console.log("New Employee Added!")
+                                        viewAllEmployees();
+                                    });
+                                });
+                        });
+                    });
+            });
+        });
 };
 
 startApp();
