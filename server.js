@@ -99,21 +99,22 @@ const startApp = () => {
 // View Employees
 const viewAllEmployees = () => {
     let sql = `SELECT employee.id,
-                employye.first_name,
-                employee.last_name,
-                role.title, 
-                department.department_name AS 'department', 
-                role.salary
-                FROM employee, role, department 
-                WHERE department.id = role.department_id 
-                AND role.id = employee.role_id
-                ORDER BY employee.id ASC`;
-    connection.promise().query(sql, (error, response) => {
-        if (error) throw error;
-        console.log(chalk.blue(`Current Employees`));
-        console.table(response);
-        startApp()
-    });
+    employee.first_name,
+    employee.last_name,
+    role.title,
+    department.department_name AS 'department',
+    role.salary
+    FROM employee, role, department
+    WHERE department.id = role.department_id
+    AND role.id = employee.role_id
+    ORDER BY employee.id ASC`;
+    connection
+        .promise()
+        .query(sql)
+        .then(([rows]) => {
+            let employees = rows;
+            console.table(employees);
+        });
 };
 
 
