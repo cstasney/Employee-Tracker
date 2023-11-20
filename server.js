@@ -316,9 +316,7 @@ const addRole = () => {
   
               connection.query(sql, crit, (error) => {
                 if (error) throw error;
-                console.log(chalk.hex('#F07857').bold(`====================================================================================`));
-                console.log(chalk.blue(`Role successfully created!`));
-                console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+                console.log(chalk.greenBright(`New Role Created!`));
                 viewAllRoles();
               });
             });
@@ -326,28 +324,28 @@ const addRole = () => {
       });
     };
   
-  // Add a New Department
-//   const addDepartment = () => {
-//       inquirer
-//         .prompt([
-//           {
-//             name: 'newDepartment',
-//             type: 'input',
-//             message: 'What is the name of your new Department?',
-//             validate: validate.validateString
-//           }
-//         ])
-//         .then((answer) => {
-//           let sql =     `INSERT INTO department (department_name) VALUES (?)`;
-//           connection.query(sql, answer.newDepartment, (error, response) => {
-//             if (error) throw error;
-//             console.log(``);
-//             console.log(chalk.greenBright(answer.newDepartment + ` Department successfully created!`));
-//             console.log(``);
-//             viewAllDepartments();
-//           });
-//         });
-//   };
+//   Add a New Department
+  const addDepartment = () => {
+      inquirer
+        .prompt([
+          {
+            name: 'newDepartment',
+            type: 'input',
+            message: 'What is the name of your new Department?',
+            validate: validate.validateString
+          }
+        ])
+        .then((answer) => {
+          let sql =     `INSERT INTO department (department_name) VALUES (?)`;
+          connection.query(sql, answer.newDepartment, (error, response) => {
+            if (error) throw error;
+            console.log(``);
+            console.log(chalk.greenBright(answer.newDepartment + ` New Department created!`));
+            console.log(``);
+            viewAllDepartments();
+          });
+        });
+  };
 
 startApp();
 
