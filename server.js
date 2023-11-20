@@ -119,18 +119,34 @@ const viewAllEmployees = () => {
 };
 
 const viewAllRoles = () => {
+    const sql = `SELECT role.id,
+                 role.title, 
+                 department.department_name AS department 
+                 FROM role
+                 INNER JOIN department ON role.department_id = department.id`;
     console.log(chalk.hex('#F07857').bold(`====================================================================================`));
-    console.log(`                              ` + chalk.blue(`Employee Roles:`));
+    console.log(`                              ` + chalk.blue(`Roles:`));
     console.log(chalk.hex('#F07857').bold(`====================================================================================`));
-    const sql = `SELECT role.id, role.title, department.department_name AS department
-                    FROM role
-                    INNER JOIN department ON role.department_id = department.id`;
     connection.promise().query(sql).then(([rows]) => {
         let roles = rows;
         console.table(roles);
         startApp();
     });
 };
+
+const viewAllDepartments = () => {
+    const sql =   `SELECT department.id AS id, department.department_name AS department FROM department`; 
+    connection.promise().query(sql).then(([rows]) => {
+        let departments = rows;    
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.log(`                              ` + chalk.blue(`Employees by Departments:`));
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.table(departments);
+        startApp();
+    });
+  };
+
+
 
 startApp();
 
