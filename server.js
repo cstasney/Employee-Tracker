@@ -4,8 +4,6 @@ const connection = require('./config/connection');
 const figlet = require("figlet");
 const chalk = require('chalk');
 
-
-
 // startup and terminal prompts for user input
 const startApp = () => {
     console.log(chalk.blue(figlet.textSync("Employee Tracker")));
@@ -114,6 +112,7 @@ const viewAllEmployees = () => {
         .then(([rows]) => {
             let employees = rows;
             console.table(employees);
+        startApp();
         });
 };
 
