@@ -5,7 +5,7 @@ const figlet = require("figlet");
 const chalk = require('chalk');
 
 // startup and terminal prompts for user input
-const startApp = () => {    
+const startApp = () => {
     console.log(chalk.hex('#F07857').bold(`====================================================================================`));
     console.log(chalk.blue(figlet.textSync("Employee Tracker")));
     console.log(`                                                          ` + chalk.greenBright.bold('Created By: Chris Stasney'));
@@ -99,17 +99,17 @@ const startApp = () => {
 // View Employees
 const viewAllEmployees = () => {
     let sql = `SELECT employee.id,
-    employee.first_name,
-    employee.last_name,
-    role.title,
-    department.department_name AS 'department',
-    role.salary
-    FROM employee, role, department
-    WHERE department.id = role.department_id
-    AND role.id = employee.role_id
-    ORDER BY employee.id ASC`;
+                employee.first_name,
+                employee.last_name,
+                role.title,
+                department.department_name AS Department,
+                role.salary
+                FROM employee, role, department
+                WHERE department.id = role.department_id
+                AND role.id = employee.role_id
+                ORDER BY employee.id ASC`;
     connection.promise().query(sql).then(([rows]) => {
-        let employees = rows;    
+        let employees = rows;
         console.log(chalk.hex('#F07857').bold(`====================================================================================`));
         console.log(`                              ` + chalk.blue(`Employees:`));
         console.log(chalk.hex('#F07857').bold(`====================================================================================`));
@@ -118,12 +118,13 @@ const viewAllEmployees = () => {
     });
 };
 
+// view all roles
 const viewAllRoles = () => {
-    const sql = `SELECT role.id,
-                 role.title, 
-                 department.department_name AS department 
-                 FROM role
-                 INNER JOIN department ON role.department_id = department.id`;
+    let sql = `SELECT role.id,
+                role.title, 
+                department.department_name AS Department 
+                FROM role
+                INNER JOIN department ON role.department_id = department.id`;
     console.log(chalk.hex('#F07857').bold(`====================================================================================`));
     console.log(`                              ` + chalk.blue(`Roles:`));
     console.log(chalk.hex('#F07857').bold(`====================================================================================`));
@@ -134,19 +135,54 @@ const viewAllRoles = () => {
     });
 };
 
+// view all departments
 const viewAllDepartments = () => {
-    const sql =   `SELECT department.id AS id, department.department_name AS department FROM department`; 
+    let sql = `SELECT department.id AS id, 
+                department.department_name AS Department FROM department`;
     connection.promise().query(sql).then(([rows]) => {
-        let departments = rows;    
+        let departments = rows;
         console.log(chalk.hex('#F07857').bold(`====================================================================================`));
-        console.log(`                              ` + chalk.blue(`Employees by Departments:`));
+        console.log(`                              ` + chalk.blue(`Departments:`));
         console.log(chalk.hex('#F07857').bold(`====================================================================================`));
         console.table(departments);
         startApp();
     });
-  };
+};
 
+// view employees by their departments
+const viewEmployeesByDepartment = () => {
+    let sql = `SELECT employee.first_name, 
+                    employee.last_name, 
+                    department.department_name AS Department
+                    FROM employee 
+                    LEFT JOIN role ON employee.role_id = role.id 
+                    LEFT JOIN department ON role.department_id = department.id`;
+    connection.promise().query(sql).then(([rows]) => {
+        let employeeDepartments = rows;
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.log(`                              ` + chalk.blue(`Employees by Department:`));
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.table(employeeDepartments);
+        startApp();
+    });
+};
 
+//View all Departments by Budget
+const viewDepartmentBudget = () => {
+    const sql = `SELECT department_id AS id, 
+                    department.department_name AS department,
+                    SUM(salary) AS budget
+                    FROM  role  
+                    INNER JOIN department ON role.department_id = department.id GROUP BY  role.department_id`;
+    connection.promise().query(sql).then(([rows]) => {
+        let departmentBudgets = rows;
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.log(`                              ` + chalk.blue(`Budget by Department:`));
+        console.log(chalk.hex('#F07857').bold(`====================================================================================`));
+        console.table(departmentBudgets);
+        startApp();
+    });
+};
 
 startApp();
 
