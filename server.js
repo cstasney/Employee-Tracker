@@ -1,9 +1,9 @@
 // dependencies
 const inquirer = require('inquirer')
-const sequelize = require('./config/connection');
+const connection = require('./config/connection');
 const figlet = require("figlet");
 const chalk = require('chalk');
-const consoleTable = ('console.table')
+
 
 
 // startup and terminal prompts for user input
@@ -91,7 +91,7 @@ const startApp = () => {
             }
 
             if (choices === 'Exit') {
-                sequelize.end();
+                connection.end();
             }
         });
 };
@@ -108,13 +108,15 @@ const viewAllEmployees = () => {
                 WHERE department.id = role.department_id 
                 AND role.id = employee.role_id
                 ORDER BY employee.id ASC`;
-    sequelize.promise().query(sql, (error, response) => {
+    connection.promise().query(sql, (error, response) => {
         if (error) throw error;
         console.log(chalk.blue(`Current Employees`));
         console.table(response);
         startApp()
     });
 };
+
+
 
 startApp();
 
