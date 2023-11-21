@@ -547,5 +547,43 @@ const removeEmployee = () => {
     });
   };
 
+// delete department
+const removeDepartment = () => {
+    let sql =   `SELECT department.id, department.department_name FROM department`;
+    connection.query(sql, (error, response) => {
+      if (error) throw error;
+      let departmentNamesArray = [];
+      response.forEach((department) => {departmentNamesArray.push(department.department_name);});
+
+      inquirer
+        .prompt([
+          {
+            name: 'chosenDept',
+            type: 'list',
+            message: 'Which department would you like to remove?',
+            choices: departmentNamesArray
+          }
+        ])
+        .then((answer) => {
+          let departmentId;
+
+          response.forEach((department) => {
+            if (answer.chosenDept === department.department_name) {
+              departmentId = department.id;
+            }
+          });
+
+          let sql =     `DELETE FROM department WHERE department.id = ?`;
+          connection.query(sql, [departmentId], (error) => {
+            if (error) throw error;
+            console.log(chalk.hex("#F07857").bold(`====================================================================================`));
+            console.log(chalk.redBright(`Department Successfully Removed`));
+            console.log(chalk.hex("#F07857").bold(`====================================================================================`));
+            viewAllDepartments();
+          });
+        });
+    });
+};
+
 startApp();
 
