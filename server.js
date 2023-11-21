@@ -508,5 +508,44 @@ const removeEmployee = () => {
     });
   };
 
+//   delete role
+  const removeRole = () => {
+    let sql = `SELECT role.id, role.title FROM role`;
+
+    connection.query(sql, (error, response) => {
+      if (error) throw error;
+      let roleNamesArray = [];
+      response.forEach((role) => {roleNamesArray.push(role.title);});
+
+      inquirer
+        .prompt([
+          {
+            name: 'chosenRole',
+            type: 'list',
+            message: 'Which role would you like to remove?',
+            choices: roleNamesArray
+          }
+        ])
+        .then((answer) => {
+          let roleId;
+
+          response.forEach((role) => {
+            if (answer.chosenRole === role.title) {
+              roleId = role.id;
+            }
+          });
+
+          let sql =   `DELETE FROM role WHERE role.id = ?`;
+          connection.query(sql, [roleId], (error) => {
+            if (error) throw error;
+            console.log(chalk.hex("#F07857").bold(`====================================================================================`));
+            console.log(chalk.greenBright(`Role Successfully Removed`));
+            console.log(chalk.hex("#F07857").bold(`====================================================================================`));
+            viewAllRoles();
+          });
+        });
+    });
+  };
+
 startApp();
 
